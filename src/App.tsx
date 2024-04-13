@@ -1,21 +1,39 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
 
-  const { data, refetch } = useQuery({
-    queryKey: ["hello-world"],
-    queryFn: async () => {
-      const response = await fetch("/api");
-      return await response.text();
+  // const { data, refetch } = useQuery({
+  //   queryKey: ["hello-world"],
+  //   queryFn: async () => {
+  //     const response = await fetch("/api");
+  //     return await response.text();
+  //   },
+  // });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (question: string) => {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        body: JSON.stringify({ question }),
+      });
+      const data = await response.json();
+      return data;
+    },
+    onSuccess(data) {
+      setAnswer(data.response);
     },
   });
 
-  console.log(data);
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    mutate(question);
+  };
 
   return (
     <>
@@ -29,10 +47,15 @@ function App() {
       </div>
       <h1>Vite + React + Cloudflare Pages</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <button onClick={() => refetch()}>Refetch</button>
+        <form onSubmit={handleSubmit}>
+          <label>Your question</label>
+          <input
+            onChange={(e) => setQuestion(e.target.value)}
+            value={question}
+          />
+          <button type="submit">Refetch</button>
+        </form>
+        <p>{isPending ? "Loading your answer" : answer}</p>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
