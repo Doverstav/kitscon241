@@ -8,14 +8,6 @@ function App() {
   const [question, setQuestion] = useState("");
   const [image, setImage] = useState("");
 
-  // const { data, refetch } = useQuery({
-  //   queryKey: ["hello-world"],
-  //   queryFn: async () => {
-  //     const response = await fetch("/api");
-  //     return await response.text();
-  //   },
-  // });
-
   const { mutate, isPending } = useMutation({
     mutationFn: async (imagePrompt: string) => {
       const response = await fetch("/api/ai/image", {
@@ -58,7 +50,6 @@ function App() {
         {isPending && <p>Loading...</p>}
         <img src={image} />
       </div>
-      <div className="card"></div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
