@@ -4,21 +4,23 @@ export interface Env {
 }
 
 interface RequestBody {
-  question: string;
+  imagePrompt: string;
 }
 
 export const onRequest: PagesFunction<Env> = async ({ env, request }) => {
-  const userInput = ((await request.json()) as RequestBody).question;
+  const prompt = ((await request.json()) as RequestBody).imagePrompt;
 
-  if (!userInput) {
+  if (!prompt) {
     return new Response("Please provide a question in the request body.", {
       status: 400,
     });
   }
 
-  const answer = await env.AI.run("@cf/meta/llama-2-7b-chat-int8", {
-    prompt: userInput,
+  const response = await env.AI.run("@cf/lykon/dreamshaper-8-lcm", {
+    prompt,
   });
 
-  return Response.json(answer);
+  return new Response(response, {
+    headers: { "Content-Type": "image/png" },
+  });
 };
