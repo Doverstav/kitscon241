@@ -1,3 +1,3 @@
 export const onRequest: PagesFunction = async () => {
-  return new Response("Hello, worldddd!", { status: 200 });
+  return new Response("Hello, world!", { status: 200 });
 };
