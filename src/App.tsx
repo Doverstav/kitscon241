@@ -21,6 +21,8 @@ TODO
 - [X] API endpoint that uses some more cloudflare services
 - [ ] Clean up code, extract components, hooks etc
 - [ ] Add some styling
+- [ ] Standalone worker demo, as a REST api? (i.e. not part of pages)
+- [ ] Deploy somewhere so people can test it themselves
 */
 
 function App() {
