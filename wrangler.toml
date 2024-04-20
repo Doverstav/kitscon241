@@ -1,5 +1,9 @@
 name = "kitscon241"
-compatibility_date = "2024-04-12"
+compatibility_date = "2024-04-05"
 
 [ai]
 binding = "AI"
+
+[[kv_namespaces]]
+binding = "NOTES"
+id = "252ff2b5de6a40c2b911c26c4d4297dd"
