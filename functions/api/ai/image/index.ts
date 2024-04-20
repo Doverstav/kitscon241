@@ -16,9 +16,12 @@ export const onRequest: PagesFunction<Env> = async ({ env, request }) => {
     });
   }
 
-  const response = await env.AI.run("@cf/lykon/dreamshaper-8-lcm", {
-    prompt,
-  });
+  const response = await env.AI.run(
+    "@cf/bytedance/stable-diffusion-xl-lightning",
+    {
+      prompt,
+    }
+  );
 
   return new Response(response, {
     headers: { "Content-Type": "image/png" },

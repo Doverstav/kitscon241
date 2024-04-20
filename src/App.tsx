@@ -91,7 +91,7 @@ function App() {
           <button type="submit">Refetch</button>
         </form>
         {isPending && <p>Loading...</p>}
-        <img src={image} />
+        <img style={{ maxWidth: "500px", maxHeight: "500px" }} src={image} />
       </div>
       <div className="card">
         <form onSubmit={handleTranslateSubmit}>
