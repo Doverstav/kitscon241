@@ -10,6 +10,14 @@ interface TranslateMutateArgs {
   target_lang: string;
 }
 
+/* 
+TODO
+- Tabs for different the different workers
+- API endpoint that uses some more cloudflare services
+- Clean up code, extract components, hooks etc
+- Add some styling
+*/
+
 function App() {
   const [question, setQuestion] = useState("");
   const [image, setImage] = useState("");
