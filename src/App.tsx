@@ -15,6 +15,8 @@ function App() {
   const [image, setImage] = useState("");
 
   const [toTranslate, setToTranslate] = useState("");
+  const [sourceLang, setSourceLang] = useState("english");
+  const [targetLang, setTargetLang] = useState("swedish");
   const [translated, setTranslated] = useState("");
 
   const { mutate, isPending } = useMutation({
@@ -56,8 +58,8 @@ function App() {
     event.preventDefault();
     translate({
       text: toTranslate,
-      source_lang: "english",
-      target_lang: "swedish",
+      source_lang: sourceLang,
+      target_lang: targetLang,
     });
   };
   return (
@@ -85,12 +87,39 @@ function App() {
       </div>
       <div className="card">
         <form onSubmit={handleTranslateSubmit}>
-          <label>Text to translate</label>
-          {/* TODO Add ability to choose source and target lang */}
-          <input
-            value={toTranslate}
-            onChange={(e) => setToTranslate(e.target.value)}
-          />
+          <label>
+            From
+            <select
+              value={sourceLang}
+              onChange={(e) => setSourceLang(e.target.value)}
+            >
+              <option value="english">English</option>
+              <option value="swedish">Swedish</option>
+              <option value="spanish">Spanish</option>
+              <option value="french">French</option>
+              <option value="german">German</option>
+            </select>
+          </label>
+          <label>
+            From
+            <select
+              value={targetLang}
+              onChange={(e) => setTargetLang(e.target.value)}
+            >
+              <option value="english">English</option>
+              <option value="swedish">Swedish</option>
+              <option value="spanish">Spanish</option>
+              <option value="french">French</option>
+              <option value="german">German</option>
+            </select>
+          </label>
+          <label>
+            Text to translate
+            <input
+              value={toTranslate}
+              onChange={(e) => setToTranslate(e.target.value)}
+            />
+          </label>
           <button type="submit">Translate</button>
         </form>
         <p>{isPendingTranslate ? "Translating" : translated}</p>
