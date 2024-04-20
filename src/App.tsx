@@ -27,7 +27,7 @@ function App() {
   const [targetLang, setTargetLang] = useState("swedish");
   const [translated, setTranslated] = useState("");
 
-  const { mutate, isPending } = useMutation({
+  const { mutate: generateImage, isPending } = useMutation({
     mutationFn: async (imagePrompt: string) => {
       const response = await fetch("/api/ai/image", {
         method: "POST",
@@ -59,7 +59,7 @@ function App() {
 
   const handleImagePromptSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    mutate(question);
+    generateImage(question);
   };
 
   const handleTranslateSubmit = (event: FormEvent<HTMLFormElement>) => {
