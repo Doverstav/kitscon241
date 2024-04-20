@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface TranslateMutateArgs {
   text: string;
@@ -10,15 +10,22 @@ interface TranslateMutateArgs {
   target_lang: string;
 }
 
+interface Note {
+  note: string;
+  id: string;
+}
+
 /* 
 TODO
-- Tabs for different the different workers
-- API endpoint that uses some more cloudflare services
-- Clean up code, extract components, hooks etc
-- Add some styling
+- [ ] Tabs for different the different workers
+- [X] API endpoint that uses some more cloudflare services
+- [ ] Clean up code, extract components, hooks etc
+- [ ] Add some styling
 */
 
 function App() {
+  const queryClient = useQueryClient();
+
   const [question, setQuestion] = useState("");
   const [image, setImage] = useState("");
 
@@ -26,6 +33,8 @@ function App() {
   const [sourceLang, setSourceLang] = useState("english");
   const [targetLang, setTargetLang] = useState("swedish");
   const [translated, setTranslated] = useState("");
+
+  const [note, setNote] = useState("");
 
   const { mutate: generateImage, isPending } = useMutation({
     mutationFn: async (imagePrompt: string) => {
@@ -57,6 +66,27 @@ function App() {
     },
   });
 
+  const { data: notes } = useQuery({
+    queryKey: ["notes"],
+    queryFn: async () => {
+      const response = await fetch("/api/notes");
+      return (await response.json()) as Note[];
+    },
+  });
+
+  const { mutate: createNote } = useMutation({
+    mutationFn: async (note: string) => {
+      await fetch("/api/notes", {
+        method: "POST",
+        body: JSON.stringify({ note }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      setNote("");
+    },
+  });
+
   const handleImagePromptSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     generateImage(question);
@@ -70,6 +100,12 @@ function App() {
       target_lang: targetLang,
     });
   };
+
+  const handleNoteSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    createNote(note);
+  };
+
   return (
     <>
       <div>
@@ -133,6 +169,21 @@ function App() {
           <button type="submit">Translate</button>
         </form>
         <p>{isPendingTranslate ? "Translating" : translated}</p>
+      </div>
+      <div className="card">
+        <h2>Notes</h2>
+        <form onSubmit={handleNoteSubmit}>
+          <label>
+            Add note
+            <input value={note} onChange={(e) => setNote(e.target.value)} />
+            <button type="submit">Create note</button>
+          </label>
+        </form>
+        <ul>
+          {notes?.map((note) => (
+            <li key={note.id}>{note.note}</li>
+          ))}
+        </ul>
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
