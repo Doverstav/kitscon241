@@ -87,6 +87,17 @@ function App() {
     },
   });
 
+  const { mutate: deleteNote } = useMutation({
+    mutationFn: async (id: string) => {
+      await fetch(`/api/notes/${id}`, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
   const handleImagePromptSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     generateImage(question);
@@ -181,7 +192,15 @@ function App() {
         </form>
         <ul>
           {notes?.map((note) => (
-            <li key={note.id}>{note.note}</li>
+            <li key={note.id}>
+              {note.note}{" "}
+              <span
+                style={{ cursor: "pointer" }}
+                onClick={() => deleteNote(note.id)}
+              >
+                &times;
+              </span>
+            </li>
           ))}
         </ul>
       </div>
