@@ -82,6 +82,7 @@ function App() {
       </div>
       <h1>Vite + React + Cloudflare Pages</h1>
       <div className="card">
+        <h2>Image generation</h2>
         <form onSubmit={handleImagePromptSubmit}>
           <label>Image prompt</label>
           <input
@@ -94,6 +95,7 @@ function App() {
         <img style={{ maxWidth: "500px", maxHeight: "500px" }} src={image} />
       </div>
       <div className="card">
+        <h2>Translation</h2>
         <form onSubmit={handleTranslateSubmit}>
           <label>
             From
