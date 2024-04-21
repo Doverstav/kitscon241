@@ -22,6 +22,7 @@ TODO
 - [ ] Clean up code, extract components, hooks etc
 - [ ] Add some styling
 - [ ] Standalone worker demo, as a REST api? (i.e. not part of pages)
+  - [ ] Migrate from pages to a standalone worker?
 - [ ] Deploy somewhere so people can test it themselves
 */
 
