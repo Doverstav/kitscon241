@@ -79,10 +79,11 @@ app.post("/api/ai/chat", async ({ req, env }) => {
 
 app.post("/api/notes", async ({ req, env }) => {
   const body = await req.json<NoteRequestBody>();
+  const noteUUID = crypto.randomUUID();
 
-  await env.NOTES.put(crypto.randomUUID(), JSON.stringify(body.note));
+  await env.NOTES.put(noteUUID, JSON.stringify(body.note));
 
-  return new Response("OK", { status: 200 });
+  return Response.json({ id: noteUUID, note: body.note }, { status: 201 });
 });
 
 app.get("/api/notes", async ({ env }) => {
@@ -105,7 +106,7 @@ app.delete("/api/notes/:id", async ({ req, env }) => {
 
   await env.NOTES.delete(id);
 
-  return new Response("OK", { status: 200 });
+  return Response.json({ id: id }, { status: 200 });
 });
 
 export default app;
