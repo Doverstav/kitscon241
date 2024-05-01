@@ -1,19 +1,10 @@
-import { FormEvent, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-interface TranslateMutateArgs {
-  text: string;
-  source_lang: string;
-  target_lang: string;
-}
-
-interface Note {
-  note: string;
-  id: string;
-}
+import { ImageGenerator } from "./components/ImageGenerator";
+import { Chat } from "./components/Chat";
+import { Translator } from "./components/Translator";
+import { Notes } from "./components/Notes";
 
 /* 
 TODO
@@ -27,132 +18,6 @@ TODO
 */
 
 function App() {
-  const queryClient = useQueryClient();
-
-  const [question, setQuestion] = useState("");
-  const [image, setImage] = useState("");
-
-  const [prompt, setPrompt] = useState("");
-  const [chat, setChat] = useState<string[]>([]);
-
-  const [toTranslate, setToTranslate] = useState("");
-  const [sourceLang, setSourceLang] = useState("english");
-  const [targetLang, setTargetLang] = useState("swedish");
-  const [translated, setTranslated] = useState("");
-
-  const [note, setNote] = useState("");
-
-  const { mutate: generateImage, isPending } = useMutation({
-    mutationFn: async (imagePrompt: string) => {
-      const response = await fetch(
-        "https://kitscon241.doverstav.workers.dev/api/ai/image",
-        {
-          method: "POST",
-          body: JSON.stringify({ imagePrompt }),
-        }
-      );
-
-      const blob = await response.blob();
-      const img = URL.createObjectURL(blob);
-
-      setImage(img);
-    },
-  });
-
-  const { mutate: generateChat, isPending: isPendingChat } = useMutation({
-    mutationFn: async (prompt: string) => {
-      const response = await fetch(
-        "https://kitscon241.doverstav.workers.dev/api/ai/chat",
-        {
-          method: "POST",
-          body: JSON.stringify({ prompt }),
-        }
-      );
-
-      const data = await response.json();
-
-      setChat((chat) => [...chat, data.response]);
-    },
-  });
-
-  const { mutate: translate, isPending: isPendingTranslate } = useMutation({
-    mutationFn: async ({
-      text,
-      source_lang,
-      target_lang,
-    }: TranslateMutateArgs) => {
-      const response = await fetch(
-        "https://kitscon241.doverstav.workers.dev/api/ai/translate",
-        {
-          method: "POST",
-          body: JSON.stringify({ text, source_lang, target_lang }),
-        }
-      );
-
-      const data = await response.json();
-      setTranslated(data.translated_text);
-    },
-  });
-
-  const { data: notes } = useQuery({
-    queryKey: ["notes"],
-    queryFn: async () => {
-      const response = await fetch(
-        "https://kitscon241.doverstav.workers.dev/api/notes"
-      );
-      return (await response.json()) as Note[];
-    },
-  });
-
-  const { mutate: createNote } = useMutation({
-    mutationFn: async (note: string) => {
-      await fetch("https://kitscon241.doverstav.workers.dev/api/notes", {
-        method: "POST",
-        body: JSON.stringify({ note }),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-      setNote("");
-    },
-  });
-
-  const { mutate: deleteNote } = useMutation({
-    mutationFn: async (id: string) => {
-      await fetch(`https://kitscon241.doverstav.workers.dev/api/notes/${id}`, {
-        method: "DELETE",
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-    },
-  });
-
-  const handleImagePromptSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    generateImage(question);
-  };
-
-  const handleChatPromptSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setChat((chat) => [...chat, prompt]);
-    generateChat(prompt);
-  };
-
-  const handleTranslateSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    translate({
-      text: toTranslate,
-      source_lang: sourceLang,
-      target_lang: targetLang,
-    });
-  };
-
-  const handleNoteSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    createNote(note);
-  };
-
   return (
     <>
       <div>
@@ -164,116 +29,10 @@ function App() {
         </a>
       </div>
       <h1>Vite + React + Cloudflare Pages</h1>
-      <div className="card">
-        <h2>Image generation</h2>
-        <form onSubmit={handleImagePromptSubmit}>
-          <label>Image prompt</label>
-          <input
-            onChange={(e) => setQuestion(e.target.value)}
-            value={question}
-          />
-          <button type="submit">Refetch</button>
-        </form>
-        {isPending && <p>Loading...</p>}
-        <img style={{ maxWidth: "500px", maxHeight: "500px" }} src={image} />
-      </div>
-      <div
-        style={{ display: "flex", flexDirection: "column" }}
-        className="card"
-      >
-        <h2>Chat</h2>
-        <form onSubmit={handleChatPromptSubmit}>
-          <label>Prompt</label>
-          <input onChange={(e) => setPrompt(e.target.value)} value={prompt} />
-          <button type="submit">Chat</button>
-        </form>
-        <div
-          style={{
-            maxHeight: "500px",
-            maxWidth: "500px",
-            overflowY: "auto",
-            textAlign: "left",
-            alignSelf: "center",
-          }}
-        >
-          {chat.map((response, index) => (
-            <p
-              style={{
-                overflowAnchor: "none",
-                fontWeight: `${index % 2 === 0 ? "bolder" : "initial"}`,
-              }}
-              key={index}
-            >
-              {response}
-            </p>
-          ))}
-          {isPendingChat && <p>Loading...</p>}
-          <div style={{ overflowAnchor: "auto", height: "1px" }}></div>
-        </div>
-      </div>
-      <div className="card">
-        <h2>Translation</h2>
-        <form onSubmit={handleTranslateSubmit}>
-          <label>
-            From
-            <select
-              value={sourceLang}
-              onChange={(e) => setSourceLang(e.target.value)}
-            >
-              <option value="english">English</option>
-              <option value="swedish">Swedish</option>
-              <option value="spanish">Spanish</option>
-              <option value="french">French</option>
-              <option value="german">German</option>
-            </select>
-          </label>
-          <label>
-            From
-            <select
-              value={targetLang}
-              onChange={(e) => setTargetLang(e.target.value)}
-            >
-              <option value="english">English</option>
-              <option value="swedish">Swedish</option>
-              <option value="spanish">Spanish</option>
-              <option value="french">French</option>
-              <option value="german">German</option>
-            </select>
-          </label>
-          <label>
-            Text to translate
-            <input
-              value={toTranslate}
-              onChange={(e) => setToTranslate(e.target.value)}
-            />
-          </label>
-          <button type="submit">Translate</button>
-        </form>
-        <p>{isPendingTranslate ? "Translating" : translated}</p>
-      </div>
-      <div className="card">
-        <h2>Notes</h2>
-        <form onSubmit={handleNoteSubmit}>
-          <label>
-            Add note
-            <input value={note} onChange={(e) => setNote(e.target.value)} />
-            <button type="submit">Create note</button>
-          </label>
-        </form>
-        <ul>
-          {notes?.map((note) => (
-            <li key={note.id}>
-              {note.note}{" "}
-              <span
-                style={{ cursor: "pointer" }}
-                onClick={() => deleteNote(note.id)}
-              >
-                &times;
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ImageGenerator />
+      <Chat />
+      <Translator />
+      <Notes />
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
