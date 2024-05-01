@@ -24,6 +24,7 @@ export const Chat = () => {
 
   const handleChatPromptSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setPrompt("");
     setChat((chat) => [...chat, prompt]);
     generateChat({ prompt, id: chatId });
   };
