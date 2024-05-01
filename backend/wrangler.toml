@@ -7,3 +7,7 @@ binding = "AI"
 [[kv_namespaces]]
 binding = "NOTES"
 id = "252ff2b5de6a40c2b911c26c4d4297dd"
+
+[[kv_namespaces]]
+binding = "CHAT_HISTORY"
+id = "4f17264a988248e4a1dd55ef363bd1d7"

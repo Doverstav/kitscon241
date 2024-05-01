@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 
 type Bindings = {
   NOTES: KVNamespace;
+  CHAT_HISTORY: KVNamespace;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   AI: any;
 };
@@ -23,6 +24,11 @@ interface NoteRequestBody {
 
 interface ChatRequestBody {
   prompt: string;
+  id: string;
+}
+
+interface ChatHistory {
+  messages: { role: string; content: string }[];
 }
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -65,14 +71,33 @@ app.post("/api/ai/translate", async ({ req, env }) => {
 app.post("/api/ai/chat", async ({ req, env }) => {
   const body = await req.json<ChatRequestBody>();
 
+  const chatHistory = await env.CHAT_HISTORY.get<ChatHistory>(body.id, {
+    type: "json",
+  });
+
+  const historyWithPrompt = chatHistory
+    ? [...chatHistory.messages, { role: "user", content: body.prompt }]
+    : [{ role: "user", content: body.prompt }];
+
   const messages = [
     { role: "system", content: "You are a friendly assistant" },
-    { role: "user", content: body.prompt },
+    ...historyWithPrompt,
   ];
 
   const response = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
     messages,
   });
+
+  const historyWithAnswer = [
+    ...historyWithPrompt,
+    { role: "system", content: response.response },
+  ];
+
+  // Save chat history so the AI has some kind of memory of the conversation
+  await env.CHAT_HISTORY.put(
+    body.id,
+    JSON.stringify({ messages: historyWithAnswer })
+  );
 
   return Response.json(response);
 });

@@ -2,17 +2,17 @@ import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 
 export const Chat = () => {
+  const [chatId] = useState(crypto.randomUUID());
   const [prompt, setPrompt] = useState("");
   const [chat, setChat] = useState<string[]>([]);
 
   const { mutate: generateChat, isPending: isPendingChat } = useMutation({
-    mutationFn: async (prompt: string) => {
-      // TODO Send entire chat history so the model has some sort of memory?
+    mutationFn: async ({ prompt, id }: { prompt: string; id: string }) => {
       const response = await fetch(
         "https://kitscon241.doverstav.workers.dev/api/ai/chat",
         {
           method: "POST",
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({ prompt, id }),
         }
       );
 
@@ -25,7 +25,7 @@ export const Chat = () => {
   const handleChatPromptSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setChat((chat) => [...chat, prompt]);
-    generateChat(prompt);
+    generateChat({ prompt, id: chatId });
   };
 
   return (
