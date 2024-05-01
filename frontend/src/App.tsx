@@ -41,10 +41,13 @@ function App() {
 
   const { mutate: generateImage, isPending } = useMutation({
     mutationFn: async (imagePrompt: string) => {
-      const response = await fetch("/api/ai/image", {
-        method: "POST",
-        body: JSON.stringify({ imagePrompt }),
-      });
+      const response = await fetch(
+        "https://kitscon241.doverstav.workers.dev/api/ai/image",
+        {
+          method: "POST",
+          body: JSON.stringify({ imagePrompt }),
+        }
+      );
 
       const blob = await response.blob();
       const img = URL.createObjectURL(blob);
@@ -59,10 +62,13 @@ function App() {
       source_lang,
       target_lang,
     }: TranslateMutateArgs) => {
-      const response = await fetch("/api/ai/translate", {
-        method: "POST",
-        body: JSON.stringify({ text, source_lang, target_lang }),
-      });
+      const response = await fetch(
+        "https://kitscon241.doverstav.workers.dev/api/ai/translate",
+        {
+          method: "POST",
+          body: JSON.stringify({ text, source_lang, target_lang }),
+        }
+      );
 
       const data = await response.json();
       setTranslated(data.translated_text);
@@ -72,14 +78,16 @@ function App() {
   const { data: notes } = useQuery({
     queryKey: ["notes"],
     queryFn: async () => {
-      const response = await fetch("/api/notes");
+      const response = await fetch(
+        "https://kitscon241.doverstav.workers.dev/api/notes"
+      );
       return (await response.json()) as Note[];
     },
   });
 
   const { mutate: createNote } = useMutation({
     mutationFn: async (note: string) => {
-      await fetch("/api/notes", {
+      await fetch("https://kitscon241.doverstav.workers.dev/api/notes", {
         method: "POST",
         body: JSON.stringify({ note }),
       });
@@ -92,7 +100,7 @@ function App() {
 
   const { mutate: deleteNote } = useMutation({
     mutationFn: async (id: string) => {
-      await fetch(`/api/notes/${id}`, {
+      await fetch(`https://kitscon241.doverstav.workers.dev/api/notes/${id}`, {
         method: "DELETE",
       });
     },
