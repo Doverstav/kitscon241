@@ -36,7 +36,7 @@ export const ImageGenerator = () => {
         <button type="submit">Refetch</button>
       </form>
       {isPending && <p>Loading...</p>}
-      <img style={{ maxWidth: "500px", maxHeight: "500px" }} src={image} />
+      <img style={{ maxWidth: "min(100%, 500px)" }} src={image} />
     </div>
   );
 };
