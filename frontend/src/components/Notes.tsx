@@ -19,6 +19,8 @@ export const Notes = () => {
       const parsedNotes = (await response.json()) as Note[];
 
       setNotes(parsedNotes);
+
+      return parsedNotes;
     },
   });
 
