@@ -21,8 +21,8 @@ TODO
 - [X] API endpoint that uses some more cloudflare services
 - [ ] Clean up code, extract components, hooks etc
 - [ ] Add some styling
-- [ ] Standalone worker demo, as a REST api? (i.e. not part of pages)
-  - [ ] Migrate from pages to a standalone worker?
+- [ ] Standalone worker demo, as a REST api?
+- [X] Migrate from pages to a standalone worker
 - [ ] Deploy somewhere so people can test it themselves
 */
 
@@ -31,6 +31,9 @@ function App() {
 
   const [question, setQuestion] = useState("");
   const [image, setImage] = useState("");
+
+  const [prompt, setPrompt] = useState("");
+  const [chat, setChat] = useState<string[]>([]);
 
   const [toTranslate, setToTranslate] = useState("");
   const [sourceLang, setSourceLang] = useState("english");
@@ -53,6 +56,22 @@ function App() {
       const img = URL.createObjectURL(blob);
 
       setImage(img);
+    },
+  });
+
+  const { mutate: generateChat, isPending: isPendingChat } = useMutation({
+    mutationFn: async (prompt: string) => {
+      const response = await fetch(
+        "https://kitscon241.doverstav.workers.dev/api/ai/chat",
+        {
+          method: "POST",
+          body: JSON.stringify({ prompt }),
+        }
+      );
+
+      const data = await response.json();
+
+      setChat((chat) => [...chat, data.response]);
     },
   });
 
@@ -114,6 +133,12 @@ function App() {
     generateImage(question);
   };
 
+  const handleChatPromptSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setChat((chat) => [...chat, prompt]);
+    generateChat(prompt);
+  };
+
   const handleTranslateSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     translate({
@@ -151,6 +176,40 @@ function App() {
         </form>
         {isPending && <p>Loading...</p>}
         <img style={{ maxWidth: "500px", maxHeight: "500px" }} src={image} />
+      </div>
+      <div
+        style={{ display: "flex", flexDirection: "column" }}
+        className="card"
+      >
+        <h2>Chat</h2>
+        <form onSubmit={handleChatPromptSubmit}>
+          <label>Prompt</label>
+          <input onChange={(e) => setPrompt(e.target.value)} value={prompt} />
+          <button type="submit">Chat</button>
+        </form>
+        <div
+          style={{
+            maxHeight: "500px",
+            maxWidth: "500px",
+            overflowY: "auto",
+            textAlign: "left",
+            alignSelf: "center",
+          }}
+        >
+          {chat.map((response, index) => (
+            <p
+              style={{
+                overflowAnchor: "none",
+                fontWeight: `${index % 2 === 0 ? "bolder" : "initial"}`,
+              }}
+              key={index}
+            >
+              {response}
+            </p>
+          ))}
+          {isPendingChat && <p>Loading...</p>}
+          <div style={{ overflowAnchor: "auto", height: "1px" }}></div>
+        </div>
       </div>
       <div className="card">
         <h2>Translation</h2>

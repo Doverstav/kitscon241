@@ -21,6 +21,10 @@ interface NoteRequestBody {
   note: string;
 }
 
+interface ChatRequestBody {
+  prompt: string;
+}
+
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.use(cors());
@@ -56,6 +60,21 @@ app.post("/api/ai/translate", async ({ req, env }) => {
   const translation = await env.AI.run("@cf/meta/m2m100-1.2b", body);
 
   return Response.json(translation);
+});
+
+app.post("/api/ai/chat", async ({ req, env }) => {
+  const body = await req.json<ChatRequestBody>();
+
+  const messages = [
+    { role: "system", content: "You are a friendly assistant" },
+    { role: "user", content: body.prompt },
+  ];
+
+  const response = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
+    messages,
+  });
+
+  return Response.json(response);
 });
 
 app.post("/api/notes", async ({ req, env }) => {
