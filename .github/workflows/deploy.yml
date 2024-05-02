@@ -38,6 +38,10 @@ jobs:
           cd frontend
           npm ci
           npm run build
+      - name: print
+        run: |
+          pw
+          ls
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
