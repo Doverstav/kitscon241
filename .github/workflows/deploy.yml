@@ -41,11 +41,12 @@ jobs:
       - name: print
         run: |
           ls -a
+          ls frontend -a
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: '/frontend/dist/'
+          path: 'frontend/dist/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
