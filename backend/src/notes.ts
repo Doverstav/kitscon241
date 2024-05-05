@@ -1,10 +1,15 @@
 import { Hono } from "hono";
 
 type Bindings = {
-  NOTES: KVNamespace;
+  NOTES_DB: D1Database;
 };
 
 interface NoteRequestBody {
+  note: string;
+}
+
+interface DBNote {
+  id: string;
   note: string;
 }
 
@@ -12,34 +17,46 @@ const app = new Hono<{ Bindings: Bindings }>();
 
 app.post("/", async ({ req, env }) => {
   const body = await req.json<NoteRequestBody>();
-  const noteUUID = crypto.randomUUID();
 
-  await env.NOTES.put(noteUUID, JSON.stringify(body.note));
+  const { success, error } = await env.NOTES_DB.prepare(
+    "insert into notes (note) values (?)"
+  )
+    .bind(body.note)
+    .run();
 
-  return Response.json({ id: noteUUID, note: body.note }, { status: 201 });
+  if (success) {
+    return new Response(undefined, { status: 201 });
+  } else {
+    return Response.json({ error }, { status: 500 });
+  }
 });
 
 app.get("/", async ({ env }) => {
-  const allKeys = await env.NOTES.list();
-  if (allKeys.keys.length === 0) {
-    return Response.json([]);
-  }
-  const allNotes = await Promise.all(
-    allKeys.keys.map(async (key) => ({
-      note: await env.NOTES.get(key.name),
-      id: key.name,
-    }))
-  );
+  const { results, success, error } = await env.NOTES_DB.prepare(
+    "select * from notes"
+  ).all<DBNote>();
 
-  return Response.json(allNotes);
+  if (success) {
+    return Response.json(results);
+  } else {
+    return Response.json({ error }, { status: 500 });
+  }
 });
 
 app.delete("/:id", async ({ req, env }) => {
   const id = req.param("id");
 
-  await env.NOTES.delete(id);
+  const { success } = await env.NOTES_DB.prepare(
+    "delete from notes where id = ?"
+  )
+    .bind(id)
+    .run();
 
-  return Response.json({ id: id }, { status: 200 });
+  if (success) {
+    return Response.json({ id });
+  } else {
+    return Response.json({ id }, { status: 500 });
+  }
 });
 
 export default app;

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 
 interface Note {
@@ -7,10 +7,11 @@ interface Note {
 }
 
 export const Notes = () => {
-  const [note, setNote] = useState("");
-  const [notes, setNotes] = useState<Note[]>([]);
+  const queryClient = useQueryClient();
 
-  useQuery({
+  const [note, setNote] = useState("");
+
+  const { data: notes } = useQuery({
     queryKey: ["notes"],
     queryFn: async () => {
       const response = await fetch(
@@ -18,43 +19,31 @@ export const Notes = () => {
       );
       const parsedNotes = (await response.json()) as Note[];
 
-      setNotes(parsedNotes);
-
       return parsedNotes;
     },
   });
 
   const { mutate: createNote } = useMutation({
     mutationFn: async (note: string) => {
-      const response = await fetch(
-        "https://kitscon241.doverstav.workers.dev/api/notes",
-        {
-          method: "POST",
-          body: JSON.stringify({ note }),
-        }
-      );
-
-      return (await response.json()) as Note;
+      await fetch("https://kitscon241.doverstav.workers.dev/api/notes", {
+        method: "POST",
+        body: JSON.stringify({ note }),
+      });
     },
-    onSuccess: (data) => {
-      setNotes((notes) => [...notes, data]);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
       setNote("");
     },
   });
 
   const { mutate: deleteNote } = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(
-        `https://kitscon241.doverstav.workers.dev/api/notes/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      return (await response.json()) as { id: string };
+      await fetch(`https://kitscon241.doverstav.workers.dev/api/notes/${id}`, {
+        method: "DELETE",
+      });
     },
-    onSuccess: (data) => {
-      setNotes((notes) => notes.filter((note) => note.id !== data.id));
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
 
