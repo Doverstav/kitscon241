@@ -52,10 +52,12 @@ button {
 
   box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
+
 button:hover {
-  color: #fff;
-  background-color: #242424;
+  color: #242424;
+  background-color: #fff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -92,5 +94,9 @@ form {
   }
   button {
     background-color: #f9f9f9;
+  }
+  button:hover {
+    color: #fff;
+    background-color: #242424;
   }
 }
