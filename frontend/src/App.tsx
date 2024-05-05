@@ -11,10 +11,10 @@ TODO
 - [X] Tabs for different the different workers
 - [X] API endpoint that uses some more cloudflare services
 - [X] Clean up code, extract components, hooks etc
-- [ ] Add some styling
+- [X] Add some styling
 - [ ] Standalone worker demo, as a REST api?
 - [X] Migrate from pages to a standalone worker
-- [ ] Deploy somewhere so people can test it themselves
+- [X] Deploy somewhere so people can test it themselves
 */
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
       <h1>Kitscon 24.1</h1>
       <p>
         A small demo site using Cloudflare workers as a backend, demonstrating
-        simple CR_D with KV as storage and trying out Workers AI.
+        some of its features such as AI models and data storage.
       </p>
       <Tabs forceRenderTabPanel>
         <TabList>

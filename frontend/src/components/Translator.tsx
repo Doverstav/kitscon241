@@ -45,8 +45,15 @@ export const Translator = () => {
     <div className="card">
       <h2>Translation</h2>
       <form onSubmit={handleTranslateSubmit}>
-        <label>
-          From
+        <div
+          style={{
+            marginBottom: "1rem",
+            display: "flex",
+            gap: "0.5rem",
+            justifyContent: "center",
+          }}
+        >
+          <label>From</label>
           <select
             value={sourceLang}
             onChange={(e) => setSourceLang(e.target.value)}
@@ -57,9 +64,7 @@ export const Translator = () => {
             <option value="french">French</option>
             <option value="german">German</option>
           </select>
-        </label>
-        <label>
-          From
+          <label>To</label>
           <select
             value={targetLang}
             onChange={(e) => setTargetLang(e.target.value)}
@@ -70,14 +75,13 @@ export const Translator = () => {
             <option value="french">French</option>
             <option value="german">German</option>
           </select>
-        </label>
-        <label>
-          Text to translate
-          <input
-            value={toTranslate}
-            onChange={(e) => setToTranslate(e.target.value)}
-          />
-        </label>
+        </div>
+        <input
+          placeholder="Text to translate"
+          type="text"
+          value={toTranslate}
+          onChange={(e) => setToTranslate(e.target.value)}
+        />
         <button type="submit">Translate</button>
       </form>
       <p>{isPendingTranslate ? "Translating" : translated}</p>

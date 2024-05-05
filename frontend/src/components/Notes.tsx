@@ -56,25 +56,31 @@ export const Notes = () => {
     <div className="card">
       <h2>Notes</h2>
       <form onSubmit={handleNoteSubmit}>
-        <label>
-          Add note
-          <input value={note} onChange={(e) => setNote(e.target.value)} />
-          <button type="submit">Create note</button>
-        </label>
+        <input
+          placeholder="Note"
+          type="text"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+        <button type="submit">Create note</button>
       </form>
-      <ul>
+      <div style={{ marginTop: "1rem" }}>
         {notes?.map((note) => (
-          <li key={note.id}>
+          <p key={note.id} style={{ margin: 0 }}>
             {note.note}{" "}
             <span
-              style={{ cursor: "pointer" }}
+              style={{
+                cursor: "pointer",
+                fontWeight: "bold",
+                fontSize: "1.25rem",
+              }}
               onClick={() => deleteNote(note.id)}
             >
               &times;
             </span>
-          </li>
+          </p>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

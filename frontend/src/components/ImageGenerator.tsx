@@ -31,9 +31,13 @@ export const ImageGenerator = () => {
     <div className="card">
       <h2>Image generation</h2>
       <form onSubmit={handleImagePromptSubmit}>
-        <label>Image prompt</label>
-        <input onChange={(e) => setQuestion(e.target.value)} value={question} />
-        <button type="submit">Refetch</button>
+        <input
+          placeholder="Image prompt"
+          type="text"
+          onChange={(e) => setQuestion(e.target.value)}
+          value={question}
+        />
+        <button type="submit">Generate</button>
       </form>
       {isPending && <p>Loading...</p>}
       <img style={{ maxWidth: "min(100%, 500px)" }} src={image} />

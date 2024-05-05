@@ -33,8 +33,11 @@ export const Chat = () => {
     <div style={{ display: "flex", flexDirection: "column" }} className="card">
       <h2>Chat</h2>
       <form onSubmit={handleChatPromptSubmit}>
-        <label>Prompt</label>
-        <input onChange={(e) => setPrompt(e.target.value)} value={prompt} />
+        <input
+          type="text"
+          onChange={(e) => setPrompt(e.target.value)}
+          value={prompt}
+        />
         <button type="submit">Chat</button>
       </form>
       <div
@@ -57,7 +60,7 @@ export const Chat = () => {
             {response}
           </p>
         ))}
-        {isPendingChat && <p>Loading...</p>}
+        {isPendingChat && <p style={{ opacity: "0.7" }}>Typing...</p>}
         <div style={{ overflowAnchor: "auto", height: "1px" }}></div>
       </div>
     </div>
