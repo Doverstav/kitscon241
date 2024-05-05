@@ -4,6 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
+    paths: ["frontend/**"]
     branches: ["master"]
 
   # Allows you to run this workflow manually from the Actions tab
@@ -46,7 +47,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: 'frontend/dist/'
+          path: "frontend/dist/"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
