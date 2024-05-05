@@ -24,3 +24,4 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountID: ${{ secrets.CF_ACCOUNT_ID }}
           workingDirectory: "backend/"
+          command: deploy --minify src/index.ts
