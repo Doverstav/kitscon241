@@ -1,0 +1,26 @@
+name: Deploy worker to cloudflare
+
+on:
+  push:
+    paths:
+      - "backend/**"
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: "worker"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountID: ${{ secrets.CF_ACCOUNT_ID }}
+          workingDirectory: "backend/"
