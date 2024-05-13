@@ -1,3 +1,8 @@
-# Kitscon 24.1
+# KitsCon 24.1
 
-Cloudflare workers and a React frontend.
+Repo for a presentation held at KitsCon 24.1.
+The demo website is deployed [here](https://doverstav.github.io/kitscon241/).
+
+- [/frontend](/frontend/) - Contains the code for the frontend of the demo website
+- [/backend](/backend/) - Contaisn the code for the backend of the demo website
+- [/docs](/docs/) - Contains the presentation and the script for the live coding portion of the demo
